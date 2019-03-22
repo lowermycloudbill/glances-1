@@ -41,7 +41,7 @@ def get_data_files():
 
 
 def get_install_requires():
-    requires = ['psutil>=5.3.0', 'requests>=2.4.2']
+    requires = ['psutil>=5.3.0', 'requests>=2.4.2', 'memory_profiler>=0.55.0']
     if sys.platform.startswith('win'):
         requires.append('bottle')
         requires.append('requests')
