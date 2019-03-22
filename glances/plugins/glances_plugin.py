@@ -391,7 +391,7 @@ class GlancesPlugin(object):
                 # Source:
                 # http://stackoverflow.com/questions/4573875/python-get-index-of-dictionary-item-in-list
                 # But https://github.com/nicolargo/glances/issues/1401
-                return self._json_dumps({item: list(map(itemgetter(item), self.stats))})
+                return self._json_dumps({item: map(itemgetter(item), self.stats)})
             except (KeyError, ValueError) as e:
                 logger.error("Cannot get item {} ({})".format(item, e))
                 return None
