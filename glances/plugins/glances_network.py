@@ -63,7 +63,7 @@ class Plugin(GlancesPlugin):
         """Return the key of the list."""
         return 'interface_name'
 
-    fp=open('/tmp/memory_profiler_stats_network.log','w+')
+    fp = open('/tmp/memory_profiler_stats_network.log', 'w+')
     @GlancesPlugin._check_decorator
     @GlancesPlugin._log_result_decorator
     @profile(stream=fp, precision=4)
@@ -81,18 +81,18 @@ class Plugin(GlancesPlugin):
             # Grab network interface stat using the psutil net_io_counter method
             try:
                 netiocounters = psutil.net_io_counters(pernic=True)
-            except UnicodeDecodeError as e:
-                #logger.debug('Can not get network interface counters ({})'.format(e))
+            except UnicodeDecodeError:
                 return self.stats
 
-            # Grab interface's status (issue #765)
-            # Grab interface's speed (issue #718)
+            # New in psutil 3.0.0
+            # - import the interface's status (issue #765)
+            # - import the interface's speed (issue #718)
             netstatus = {}
             try:
                 netstatus = psutil.net_if_stats()
-            except OSError as e:
+            except OSError:
                 # see psutil #797/glances #1106
-                logger.debug('Can not get network interface status ({})'.format(e))
+                pass
 
             # Previous network interface stats are stored in the network_old variable
             if not hasattr(self, 'network_old'):
@@ -101,51 +101,50 @@ class Plugin(GlancesPlugin):
                     self.network_old = netiocounters
                 except (IOError, UnboundLocalError):
                     pass
-                return self.stats
+            else:
+                # By storing time data we enable Rx/s and Tx/s calculations in the
+                # XML/RPC API, which would otherwise be overly difficult work
+                # for users of the API
+                time_since_update = getTimeSinceLastUpdate('net')
 
-            # By storing time data we enable Rx/s and Tx/s calculations in the
-            # XML/RPC API, which would otherwise be overly difficult work
-            # for users of the API
-            time_since_update = getTimeSinceLastUpdate('net')
+                # Loop over interfaces
+                network_new = netiocounters
+                for net in network_new:
+                    # Do not take hidden interface into account
+                    # or KeyError: 'eth0' when interface is not connected #1348
+                    if self.is_hide(net) or net not in netstatus:
+                        continue
+                    try:
+                        cumulative_rx = network_new[net].bytes_recv
+                        cumulative_tx = network_new[net].bytes_sent
+                        cumulative_cx = cumulative_rx + cumulative_tx
+                        rx = cumulative_rx - self.network_old[net].bytes_recv
+                        tx = cumulative_tx - self.network_old[net].bytes_sent
+                        cx = rx + tx
+                        netstat = {
+                            'interface_name': net,
+                            'time_since_update': time_since_update,
+                            'cumulative_rx': cumulative_rx,
+                            'rx': rx,
+                            'cumulative_tx': cumulative_tx,
+                            'tx': tx,
+                            'cumulative_cx': cumulative_cx,
+                            'cx': cx}
+                    except KeyError:
+                        continue
+                    else:
+                        # Interface status
+                        netstat['is_up'] = netstatus[net].isup
+                        # Interface speed in Mbps, convert it to bps
+                        # Can be always 0 on some OSes
+                        netstat['speed'] = netstatus[net].speed * 1048576
 
-            # Loop over interfaces
-            network_new = netiocounters
-            for net in network_new:
-                # Do not take hidden interface into account
-                # or KeyError: 'eth0' when interface is not connected #1348
-                if self.is_hide(net) or net not in netstatus:
-                    continue
-                try:
-                    cumulative_rx = network_new[net].bytes_recv
-                    cumulative_tx = network_new[net].bytes_sent
-                    cumulative_cx = cumulative_rx + cumulative_tx
-                    rx = cumulative_rx - self.network_old[net].bytes_recv
-                    tx = cumulative_tx - self.network_old[net].bytes_sent
-                    cx = rx + tx
-                    netstat = {'interface_name': net,
-                               'time_since_update': time_since_update,
-                               'cumulative_rx': cumulative_rx,
-                               'rx': rx,
-                               'cumulative_tx': cumulative_tx,
-                               'tx': tx,
-                               'cumulative_cx': cumulative_cx,
-                               'cx': cx,
-                               # Interface status
-                               'is_up': netstatus[net].isup,
-                               # Interface speed in Mbps, convert it to bps
-                               # Can be always 0 on some OSes
-                               'speed': netstatus[net].speed * 1048576,
-                               # Set the key for the dict
-                               'key': self.get_key()
-                               }
-                except KeyError:
-                    continue
-                else:
-                    # Append the interface stats to the list
-                    stats.append(netstat)
+                        # Finaly, set the key
+                        netstat['key'] = self.get_key()
+                        stats.append(netstat)
 
-            # Save stats to compute next bitrate
-            self.network_old = network_new
+                # Save stats to compute next bitrate
+                self.network_old = network_new
 
         elif self.input_method == 'snmp':
             # Update stats using SNMP
