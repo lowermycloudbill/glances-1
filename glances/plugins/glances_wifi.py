@@ -28,6 +28,8 @@ from glances.plugins.glances_plugin import GlancesPlugin
 import psutil
 # Use the Wifi Python lib (https://pypi.python.org/pypi/wifi)
 # Linux-only
+from memory_profiler import profile
+
 try:
     from wifi.scan import Cell
     from wifi.exceptions import InterfaceError
@@ -64,8 +66,10 @@ class Plugin(GlancesPlugin):
         """
         return 'ssid'
 
+    fp=open('/tmp/memory_profiler_stats_wifi.log','w+')
     @GlancesPlugin._check_decorator
     @GlancesPlugin._log_result_decorator
+    @profile(stream=fp, precision=4)
     def update(self):
         """Update Wifi stats using the input method.
 

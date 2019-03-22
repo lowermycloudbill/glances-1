@@ -22,6 +22,7 @@
 from glances.logger import logger
 from glances.cpu_percent import cpu_percent
 from glances.plugins.glances_plugin import GlancesPlugin
+from memory_profiler import profile
 
 # Define the history items list
 items_history_list = [{'name': 'user',
@@ -52,8 +53,10 @@ class Plugin(GlancesPlugin):
         """Return the key of the list."""
         return 'cpu_number'
 
+    fp=open('/tmp/memory_profiler_stats_percpu.log','w+')
     @GlancesPlugin._check_decorator
     @GlancesPlugin._log_result_decorator
+    @profile(stream=fp, precision=4)
     def update(self):
         """Update per-CPU stats using the input method."""
         # Init new stats

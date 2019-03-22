@@ -21,6 +21,7 @@
 
 from glances.processes import glances_processes
 from glances.plugins.glances_plugin import GlancesPlugin
+from memory_profiler import profile
 
 # Define the history items list
 items_history_list = [{'name': 'total',
@@ -60,6 +61,8 @@ class Plugin(GlancesPlugin):
 
         # Note: 'glances_processes' is already init in the glances_processes.py script
 
+    fp=open('/tmp/memory_profiler_stats_processcount.log','w+')
+    @profile(stream=fp, precision=4)
     def update(self):
         """Update processes stats using the input method."""
         # Init new stats
