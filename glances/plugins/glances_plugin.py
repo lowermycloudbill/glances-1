@@ -124,6 +124,12 @@ class GlancesPlugin(object):
         """Return the key of the list."""
         return None
 
+    def get_stats_size(self):
+        """Return the size of stats"""
+        if self.stats:
+            return len(self.stats)
+        return 0
+
     def is_enable(self, plugin_name=None):
         """Return true if plugin is enabled."""
         if not plugin_name:

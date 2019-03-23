@@ -220,6 +220,7 @@ class GlancesStats(object):
                 continue
             # Update the stats...
             self._plugins[p].update()
+            logger.debug("CloudAdmin Plugin " + p + " contains " + str(self._plugins[p].get_stats_size()) + " items")
             # ... the history
             # self._plugins[p].update_stats_history()
             # ... and the views
