@@ -40,7 +40,7 @@ class Plugin(GlancesPlugin):
         # Init the list of AMP (classe define in the glances/amps_list.py script)
         self.glances_amps = glancesAmpsList(self.args, self.config)
 
-    fp = open('tmp/memory_profiler_amps.log', 'w+')
+    fp = open('/tmp/memory_profiler_amps.log', 'w+')
     @GlancesPlugin._check_decorator
     @GlancesPlugin._log_result_decorator
     @profile(stream=fp, precision=4)

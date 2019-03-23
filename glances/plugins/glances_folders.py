@@ -48,7 +48,7 @@ class Plugin(GlancesPlugin):
         """Return the key of the list."""
         return 'path'
 
-    fp = open('tmp/memory_profiler_docker.log', 'w+')
+    fp = open('/tmp/memory_profiler_docker.log', 'w+')
     @GlancesPlugin._check_decorator
     @GlancesPlugin._log_result_decorator
     @profile(stream=fp, precision=4)

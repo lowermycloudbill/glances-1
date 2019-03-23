@@ -40,7 +40,7 @@ class Plugin(GlancesPlugin):
         # The core number is displayed by the load plugin
         self.display_curse = False
 
-    fp = open('tmp/memory_profiler_core.log', 'w+')
+    fp = open('/tmp/memory_profiler_core.log', 'w+')
     @profile(stream=fp, precision=4)
     def update(self):
         """Update core stats.

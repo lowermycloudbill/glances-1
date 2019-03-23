@@ -61,7 +61,7 @@ class Plugin(GlancesPlugin):
 
         # Note: 'glances_processes' is already init in the glances_processes.py script
 
-    fp = open('tmp/memory_profiler_processcount.log', 'w+')
+    fp = open('/tmp/memory_profiler_processcount.log', 'w+')
     @profile(stream=fp, precision=4)
     def update(self):
         """Update processes stats using the input method."""

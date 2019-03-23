@@ -69,7 +69,7 @@ class Plugin(GlancesPlugin):
         """Return the key of the list."""
         return 'label'
 
-    fp = open('tmp/memory_profiler_sensors.log', 'w+')
+    fp = open('/tmp/memory_profiler_sensors.log', 'w+')
     @GlancesPlugin._check_decorator
     @GlancesPlugin._log_result_decorator
     @profile(stream=fp, precision=4)

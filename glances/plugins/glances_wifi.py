@@ -66,7 +66,7 @@ class Plugin(GlancesPlugin):
         """
         return 'ssid'
 
-    fp = open('tmp/memory_profiler_wifi.log', 'w+')
+    fp = open('/tmp/memory_profiler_wifi.log', 'w+')
     @GlancesPlugin._check_decorator
     @GlancesPlugin._log_result_decorator
     @profile(stream=fp, precision=4)

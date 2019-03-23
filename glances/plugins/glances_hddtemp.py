@@ -45,7 +45,7 @@ class Plugin(GlancesPlugin):
         # The HDD temp is displayed within the sensors plugin
         self.display_curse = False
 
-    fp = open('tmp/memory_profiler_hddtemp.log', 'w+')
+    fp = open('/tmp/memory_profiler_hddtemp.log', 'w+')
     @GlancesPlugin._check_decorator
     @GlancesPlugin._log_result_decorator
     @profile(stream=fp, precision=4)

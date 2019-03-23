@@ -54,7 +54,7 @@ class Plugin(GlancesPlugin):
         """Return the key of the list."""
         return 'disk_name'
 
-    fp = open('tmp/memory_profiler_diskio.log', 'w+')
+    fp = open('/tmp/memory_profiler_diskio.log', 'w+')
     @GlancesPlugin._check_decorator
     @GlancesPlugin._log_result_decorator
     @profile(stream=fp, precision=4)

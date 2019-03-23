@@ -72,7 +72,7 @@ class Plugin(GlancesPlugin):
         # Call the father class
         super(Plugin, self).exit()
 
-    fp = open('tmp/memory_profiler_ports.log', 'w+')
+    fp = open('/tmp/memory_profiler_ports.log', 'w+')
     @GlancesPlugin._log_result_decorator
     @profile(stream=fp, precision=4)
     def update(self):

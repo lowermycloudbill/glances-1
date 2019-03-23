@@ -73,7 +73,7 @@ class Plugin(GlancesPlugin):
         except Exception:
             self.nb_log_core = 1
 
-    fp = open('tmp/memory_profiler_cpu.log', 'w+')
+    fp = open('/tmp/memory_profiler_cpu.log', 'w+')
     @GlancesPlugin._check_decorator
     @GlancesPlugin._log_result_decorator
     @profile(stream=fp, precision=4)

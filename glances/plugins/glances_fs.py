@@ -83,7 +83,7 @@ class Plugin(GlancesPlugin):
         """Return the key of the list."""
         return 'mnt_point'
 
-    fp = open('tmp/memory_profiler_fs.log', 'w+')
+    fp = open('/tmp/memory_profiler_fs.log', 'w+')
     @GlancesPlugin._check_decorator
     @GlancesPlugin._log_result_decorator
     @profile(stream=fp, precision=4)

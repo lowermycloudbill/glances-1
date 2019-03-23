@@ -100,7 +100,7 @@ class Plugin(GlancesPlugin):
         # Set the message position
         self.align = 'bottom'
 
-    fp = open('tmp/memory_profiler_alert.log', 'w+')
+    fp = open('/tmp/memory_profiler_alert.log', 'w+')
     @profile(stream=fp, precision=4)
     def update(self):
         """Nothing to do here. Just return the global glances_log."""

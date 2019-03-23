@@ -79,7 +79,7 @@ class Plugin(GlancesPlugin):
         """Return the key of the list."""
         return 'gpu_id'
 
-    fp = open('tmp/memory_profiler_gpu.log', 'w+')
+    fp = open('/tmp/memory_profiler_gpu.log', 'w+')
     @GlancesPlugin._check_decorator
     @GlancesPlugin._log_result_decorator
     @profile(stream=fp, precision=4)

@@ -50,7 +50,7 @@ class Plugin(GlancesPlugin):
         # We want to display the stat in the curse interface
         self.display_curse = True
 
-    fp = open('tmp/memory_profiler_quicklook.log', 'w+')
+    fp = open('/tmp/memory_profiler_quicklook.log', 'w+')
     @GlancesPlugin._check_decorator
     @GlancesPlugin._log_result_decorator
     @profile(stream=fp, precision=4)
