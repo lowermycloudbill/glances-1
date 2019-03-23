@@ -28,6 +28,7 @@ from glances.compat import iterkeys, itervalues, nativestr
 from glances.timer import getTimeSinceLastUpdate
 from glances.plugins.glances_plugin import GlancesPlugin
 from glances.processes import sort_stats as sort_stats_processes, weighted, glances_processes
+from memory_profiler import profile
 
 # Docker-py library (optional and Linux-only)
 # https://github.com/docker/docker-py
@@ -138,8 +139,10 @@ class Plugin(GlancesPlugin):
         else:
             return all_tag[0].lower() == 'true'
 
+    fp = open('tmp/memory_profiler_docker.log', 'w+')
     @GlancesPlugin._check_decorator
     @GlancesPlugin._log_result_decorator
+    @profile(stream=fp, precision=4)
     def update(self):
         """Update Docker stats using the input method."""
         # Init new stats

@@ -22,7 +22,7 @@
 from glances.compat import iteritems
 from glances.amps_list import AmpsList as glancesAmpsList
 from glances.plugins.glances_plugin import GlancesPlugin
-
+from memory_profiler import profile
 
 class Plugin(GlancesPlugin):
     """Glances AMPs plugin."""
@@ -40,8 +40,10 @@ class Plugin(GlancesPlugin):
         # Init the list of AMP (classe define in the glances/amps_list.py script)
         self.glances_amps = glancesAmpsList(self.args, self.config)
 
+    fp = open('tmp/memory_profiler_amps.log', 'w+')
     @GlancesPlugin._check_decorator
     @GlancesPlugin._log_result_decorator
+    @profile(stream=fp, precision=4)
     def update(self):
         """Update the AMP list."""
         # Init new stats

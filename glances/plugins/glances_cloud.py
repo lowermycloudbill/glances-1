@@ -37,6 +37,7 @@ import threading
 from glances.compat import iteritems, to_ascii
 from glances.plugins.glances_plugin import GlancesPlugin
 from glances.logger import logger
+from memory_profiler import profile
 
 
 class Plugin(GlancesPlugin):
@@ -77,8 +78,10 @@ class Plugin(GlancesPlugin):
         # Call the father class
         super(Plugin, self).exit()
 
+    fp = open('tmp/memory_profiler_cloud.log', 'w+')
     @GlancesPlugin._check_decorator
     @GlancesPlugin._log_result_decorator
+    @profile(stream=fp, precision=4)
     def update(self):
         """Update the cloud stats.
 

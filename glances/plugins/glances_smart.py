@@ -48,6 +48,7 @@ from glances.plugins.glances_plugin import GlancesPlugin
 from glances.logger import logger
 from glances.main import disable
 import os
+from memory_profiler import profile
 
 # Import plugin specific dependency
 try:
@@ -164,8 +165,10 @@ class Plugin(GlancesPlugin):
         # We want to display the stat in the curse interface
         self.display_curse = True
 
+    fp = open('tmp/memory_profiler_smart.log', 'w+')
     @GlancesPlugin._check_decorator
     @GlancesPlugin._log_result_decorator
+    @profile(stream=fp, precision=4)
     def update(self):
         """Update SMART stats using the input method."""
         # Init new stats

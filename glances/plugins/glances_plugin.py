@@ -34,7 +34,7 @@ from glances.history import GlancesHistory
 from glances.logger import logger
 from glances.events import glances_events
 from glances.thresholds import glances_thresholds
-
+from memory_profiler import profile
 
 class GlancesPlugin(object):
     """Main class for Glances plugin."""

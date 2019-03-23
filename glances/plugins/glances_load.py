@@ -24,6 +24,7 @@ import os
 from glances.compat import iteritems
 from glances.plugins.glances_core import Plugin as CorePlugin
 from glances.plugins.glances_plugin import GlancesPlugin
+from memory_profiler import profile
 
 # SNMP OID
 # 1 minute Load: .1.3.6.1.4.1.2021.10.1.3.1
@@ -63,8 +64,10 @@ class Plugin(GlancesPlugin):
         except Exception:
             self.nb_log_core = 1
 
+    fp = open('tmp/memory_profiler_load.log', 'w+')
     @GlancesPlugin._check_decorator
     @GlancesPlugin._log_result_decorator
+    @profile(stream=fp, precision=4)
     def update(self):
         """Update load stats."""
         # Init new stats

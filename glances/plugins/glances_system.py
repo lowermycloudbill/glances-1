@@ -26,6 +26,7 @@ from io import open
 
 from glances.compat import iteritems
 from glances.plugins.glances_plugin import GlancesPlugin
+from memory_profiler import profile
 
 # SNMP OID
 snmp_oid = {'default': {'hostname': '1.3.6.1.2.1.1.5.0',
@@ -90,8 +91,10 @@ class Plugin(GlancesPlugin):
         # We want to display the stat in the curse interface
         self.display_curse = True
 
+    fp = open('tmp/memory_profiler_system.log', 'w+')
     @GlancesPlugin._check_decorator
     @GlancesPlugin._log_result_decorator
+    @profile(stream=fp, precision=4)
     def update(self):
         """Update the host/system info using the input method.
 

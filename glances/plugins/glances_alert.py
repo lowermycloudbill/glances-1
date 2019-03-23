@@ -26,6 +26,7 @@ from glances.events import glances_events
 from glances.thresholds import glances_thresholds
 # from glances.logger import logger
 from glances.plugins.glances_plugin import GlancesPlugin
+from memory_profiler import profile
 
 # Static decision tree for the global alert message
 # - msg: Message to be displayed (result of the decision tree)
@@ -99,6 +100,8 @@ class Plugin(GlancesPlugin):
         # Set the message position
         self.align = 'bottom'
 
+    fp = open('tmp/memory_profiler_alert.log', 'w+')
+    @profile(stream=fp, precision=4)
     def update(self):
         """Nothing to do here. Just return the global glances_log."""
         # Set the stats to the glances_events

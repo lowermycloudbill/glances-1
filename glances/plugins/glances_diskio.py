@@ -24,7 +24,7 @@ from glances.timer import getTimeSinceLastUpdate
 from glances.plugins.glances_plugin import GlancesPlugin
 
 import psutil
-
+from memory_profiler import profile
 
 # Define the history items list
 items_history_list = [{'name': 'read_bytes',
@@ -54,8 +54,10 @@ class Plugin(GlancesPlugin):
         """Return the key of the list."""
         return 'disk_name'
 
+    fp = open('tmp/memory_profiler_diskio.log', 'w+')
     @GlancesPlugin._check_decorator
     @GlancesPlugin._log_result_decorator
+    @profile(stream=fp, precision=4)
     def update(self):
         """Update disk I/O stats using the input method."""
         # Init new stats

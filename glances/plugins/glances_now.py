@@ -23,7 +23,7 @@ from time import tzname, localtime
 from datetime import datetime
 
 from glances.plugins.glances_plugin import GlancesPlugin
-
+from memory_profiler import profile
 
 class Plugin(GlancesPlugin):
     """Plugin to get the current date/time.
@@ -45,6 +45,8 @@ class Plugin(GlancesPlugin):
         """Reset/init the stats."""
         self.stats = ''
 
+    fp = open('tmp/memory_profiler_now.log', 'w+')
+    @profile(stream=fp, precision=4)
     def update(self):
         """Update current date/time."""
         # Had to convert it to string because datetime is not JSON serializable
