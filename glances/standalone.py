@@ -32,6 +32,9 @@ from glances.outputs.glances_stdout_csv import GlancesStdoutCsv
 from glances.outdated import Outdated
 from glances.timer import Counter
 
+from guppy import hpy
+from pkgcore.config import load_config
+
 
 class GlancesStandalone(object):
 
@@ -113,6 +116,7 @@ class GlancesStandalone(object):
         """
         # Start a counter used to compute the time needed for
         # update and export the stats
+
         counter = Counter()
 
         # Update stats
@@ -123,6 +127,11 @@ class GlancesStandalone(object):
         counter_export = Counter()
         self.stats.export(self.stats)
         logger.debug('Stats exported in {} seconds'.format(counter_export.get()))
+
+        # Flush all stats
+        counter_reset = Counter()
+        self.stats.reset()
+        logger.debug('Stats reset in {} seconds'.format(counter_reset.get()))
 
         # Patch for issue1326 to avoid < 0 refresh
         adapted_refresh = self.refresh_time - counter.get()
@@ -139,14 +148,18 @@ class GlancesStandalone(object):
             # Break should be done via a signal (CTRL-C)
             time.sleep(adapted_refresh)
             ret = True
-
         return ret
 
     def serve_forever(self):
         """Wrapper to the serve_forever function."""
         loop = True
+        hp = hpy()
+        hp.setrelheap()
+
         while loop:
             loop = self.__serve_forever()
+            h = hp.heap()
+            print h
         self.end()
 
     def end(self):

@@ -22,7 +22,6 @@
 import collections
 import os
 import sys
-import threading
 import traceback
 
 from glances.globals import exports_path, plugins_path, sys_path
@@ -226,6 +225,19 @@ class GlancesStats(object):
             # ... and the views
             # self._plugins[p].update_views()
 
+    def reset(self):
+        """Wrapper method to reset the stats."""
+        # For standalone and server modes
+        # For each plugins, call the reset method
+        for p in self._plugins:
+            if self._plugins[p].is_disable():
+                # If current plugin is disable
+                # then continue to next plugin
+                continue
+            # Reset the stats...
+            self._plugins[p].reset()
+            logger.debug("CloudAdmin Plugin " + p + " contains " + str(self._plugins[p].get_stats_size()) + " items")
+
     def export(self, input_stats=None):
         """Export all the stats.
 
@@ -235,11 +247,7 @@ class GlancesStats(object):
         input_stats = input_stats or {}
 
         for e in self._exports:
-            logger.debug("Export stats using the %s module" % e)
-            thread = threading.Thread(target=self._exports[e].update,
-                                      args=(input_stats,))
-            # threads.append(thread)
-            thread.start()
+            self._exports[e].update(input_stats)
 
     def getAll(self):
         """Return all the stats (list)."""

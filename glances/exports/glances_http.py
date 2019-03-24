@@ -79,5 +79,8 @@ class Export(GlancesExportBulk):
         f.close()
         os._exit(0)
       else:
-        r = requests.post(self.http_endpoint, json=self.bulk, headers=self.headers)
+        try:
+            r = requests.post(self.http_endpoint, json=self.bulk, headers=self.headers, timeout=5)
+        except Exception as e:
+            logger.debug('cloud plugin - Cannot connect to the AWS EC2 API {}: {}'.format(self.http_endpoint, e))
       self.bulk = {}

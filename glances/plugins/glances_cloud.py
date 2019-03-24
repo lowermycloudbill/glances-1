@@ -24,6 +24,7 @@ Supported Cloud API:
 - AWS EC2 (class ThreadAwsEc2Grabber, see bellow)
 """
 
+# AWS EC2
 try:
     import requests
 except ImportError:
@@ -32,7 +33,6 @@ else:
     cloud_tag = True
 
 import json
-import threading
 
 from glances.compat import iteritems, to_ascii
 from glances.plugins.glances_plugin import GlancesPlugin
@@ -40,7 +40,62 @@ from glances.logger import logger
 
 
 class Plugin(GlancesPlugin):
+    AWS = 'aws'
+    AZURE = 'azure'
+    GCP = 'gcp'
+    OPC = 'opc'
+    ALIBABA = 'alibaba'
 
+    # http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-metadata.html
+    AWS_EC2_API_URL = 'http://169.254.169.254/latest/dynamic/instance-identity/document'
+    AWS_EC2_API_URL_CHECK = 'http://169.254.169.254/latest/dynamic/instance-identity/document'
+
+    # https://docs.microsoft.com/en-us/azure/virtual-machines/windows/instance-metadata-service
+    AZURE_VM_API_URL = 'http://169.254.169.254/metadata/instance?api-version=2017-12-01'
+    AZURE_VM_API_URL_CHECK = 'http://169.254.169.254/metadata/instance?api-version=2017-12-01'
+
+    # https://cloud.google.com/compute/docs/storing-retrieving-metadata#querying
+    GCP_VM_API_URL = 'http://metadata.google.internal/computeMetadata/v1/instance'
+    GCP_VM_API_URL_CHECK = 'http://metadata.google.internal/computeMetadata/v1/instance/id'
+    GCP_VM_API_METADATA = {'cpu-platform': 'cpu-platform',
+                           'description': 'description',
+                           'hostname': 'hostname',
+                           'id': 'id',
+                           'machine-type': 'machine-type',
+                           'name': 'name',
+                           'tags': 'tags',
+                           'zone': 'zone'
+                           }
+    # https://docs.cloud.oracle.com/iaas/Content/Compute/Tasks/gettingmetadata.htm
+    OPC_VM_API_URL = 'http://169.254.169.254/opc/v1/instance/'
+    OPC_VM_API_URL_CHECK = 'http://169.254.169.254/opc/v1/instance/'
+
+    ALIBABA_VM_API_URL = 'http://100.100.100.200/latest/meta-data'
+    ALIBABA_VM_API_URL_CHECK = 'http://100.100.100.200/latest/meta-data/instance-id'
+    ALIBABA_VM_API_URL_METADATA = {'dns-conf/nameservers': 'dns-conf/nameservers',
+                                   'eipv4': 'eipv4',
+                                   'hostname': 'hostname',
+                                   'image-id': 'image-id',
+                                   'image/market-place/product-code': 'image/market-place/product-code',
+                                   'image/market-place/charge-type': 'image/market-place/charge-type',
+                                   'instance-id': 'instance-id',
+                                   'mac': 'mac',
+                                   'network-type': 'network-type',
+                                   'owner-account-id': 'owner-account-id',
+                                   'private-ipv4': 'private-ipv4',
+                                   'public-ipv4': 'public-ipv4',
+                                   'region-id': 'region-id',
+                                   'zone-id': 'zone-id',
+                                   'serial-number': 'serial-number',
+                                   'vpc-id': 'vpc-id',
+                                   'vpc-cidr-block': 'vpc-cidr-block',
+                                   'vswitch-cidr-block': 'vswitch-cidr-block',
+                                   'vswitch-id': 'vswitch-id',
+                                   'instance/spot/termination-time': 'instance/spot/termination-time',
+                                   'network/interfaces/macs': 'network/interfaces/macs',
+                                   'instance/virtualization-solution': 'instance/virtualization-solution',
+                                   'instance/virtualization-solution-version': 'instance/virtualization-solution-version',
+                                   'instance/last-host-landing-time': 'instance/last-host-landing-time'}
     """Glances' cloud plugin.
 
     The goal of this plugin is to retreive additional information
@@ -58,24 +113,11 @@ class Plugin(GlancesPlugin):
         # We want to display the stat in the curse interface
         self.display_curse = True
 
-        # Init the stats
-        self.reset()
-
-        # Init thread to grab AWS EC2 stats asynchroniously
-        self.aws_ec2 = ThreadAwsEc2Grabber()
-
-        # Run the thread
-        self.aws_ec2. start()
+        self._stats = {}
 
     def reset(self):
         """Reset/init the stats."""
         self.stats = {}
-
-    def exit(self):
-        """Overwrite the exit method to close threads"""
-        self.aws_ec2.stop()
-        # Call the father class
-        super(Plugin, self).exit()
 
     @GlancesPlugin._check_decorator
     @GlancesPlugin._log_result_decorator
@@ -93,7 +135,7 @@ class Plugin(GlancesPlugin):
 
         # Update the stats
         if self.input_method == 'local':
-            self.stats = self.aws_ec2.stats
+            self.stats = self.get_local_stats()
             # self.stats = {'ami-id': 'ami-id',
             #                         'instance-id': 'instance-id',
             #                         'instance-type': 'instance-type',
@@ -120,96 +162,20 @@ class Plugin(GlancesPlugin):
         logger.info(ret)
         return ret
 
-
-class ThreadAwsEc2Grabber(threading.Thread):
-    """
-    Specific thread to grab AWS EC2 stats.
-
-    stats is a dict
-    """
-
-    # AWS EC2
-    AWS = 'aws'
-    AZURE = 'azure'
-    GCP = 'gcp'
-    OPC = 'opc'
-    ALIBABA = 'alibaba'
-
-    # http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-metadata.html
-    AWS_EC2_API_URL = 'http://169.254.169.254/latest/dynamic/instance-identity/document'
-    AWS_EC2_API_URL_CHECK = 'http://169.254.169.254/latest/dynamic/instance-identity/document'
-
-    # https://docs.microsoft.com/en-us/azure/virtual-machines/windows/instance-metadata-service
-    AZURE_VM_API_URL = 'http://169.254.169.254/metadata/instance?api-version=2017-12-01'
-    AZURE_VM_API_URL_CHECK = 'http://169.254.169.254/metadata/instance?api-version=2017-12-01'
-
-    # https://cloud.google.com/compute/docs/storing-retrieving-metadata#querying
-    GCP_VM_API_URL = 'http://metadata.google.internal/computeMetadata/v1/instance'
-    GCP_VM_API_URL_CHECK = 'http://metadata.google.internal/computeMetadata/v1/instance/id'
-    GCP_VM_API_METADATA = {'cpu-platform': 'cpu-platform',
-                           'description' : 'description',
-                           'hostname' : 'hostname',
-                           'id' : 'id',
-                           'machine-type' : 'machine-type',
-                           'name' : 'name',
-                           'tags' : 'tags',
-                           'zone' : 'zone'
-                           }
-    # https://docs.cloud.oracle.com/iaas/Content/Compute/Tasks/gettingmetadata.htm
-    OPC_VM_API_URL = 'http://169.254.169.254/opc/v1/instance/'
-    OPC_VM_API_URL_CHECK = 'http://169.254.169.254/opc/v1/instance/'
-
-    ALIBABA_VM_API_URL = 'http://100.100.100.200/latest/meta-data'
-    ALIBABA_VM_API_URL_CHECK = 'http://100.100.100.200/latest/meta-data/instance-id'
-    ALIBABA_VM_API_URL_METADATA = {'dns-conf/nameservers' : 'dns-conf/nameservers',
-                                    'eipv4' : 'eipv4',
-                                    'hostname' : 'hostname',
-                                    'image-id' : 'image-id',
-                                    'image/market-place/product-code' : 'image/market-place/product-code',
-                                    'image/market-place/charge-type' : 'image/market-place/charge-type',
-                                    'instance-id' : 'instance-id',
-                                    'mac' : 'mac',
-                                    'network-type' : 'network-type',
-                                    'owner-account-id' : 'owner-account-id',
-                                    'private-ipv4' : 'private-ipv4',
-                                    'public-ipv4' : 'public-ipv4',
-                                    'region-id' : 'region-id',
-                                    'zone-id' : 'zone-id',
-                                    'serial-number' : 'serial-number',
-                                    'vpc-id' : 'vpc-id',
-                                    'vpc-cidr-block' : 'vpc-cidr-block',
-                                    'vswitch-cidr-block' : 'vswitch-cidr-block',
-                                    'vswitch-id' : 'vswitch-id',
-                                    'instance/spot/termination-time' : 'instance/spot/termination-time',
-                                    'network/interfaces/macs' : 'network/interfaces/macs',
-                                    'instance/virtualization-solution' : 'instance/virtualization-solution',
-                                    'instance/virtualization-solution-version' : 'instance/virtualization-solution-version',
-                                    'instance/last-host-landing-time' : 'instance/last-host-landing-time'}
-
-    def __init__(self):
-        """Init the class"""
-        logger.debug("cloud plugin - Create thread for AWS EC2")
-        super(ThreadAwsEc2Grabber, self).__init__()
-        # Event needed to stop properly the thread
-        self._stopper = threading.Event()
-        # The class return the stats as a dict
-        self._stats = {}
-
-    def run(self):
+    def get_local_stats(self):
         """Function called to grab stats.
         Infinite loop, should be stopped by calling the stop() method"""
 
         if not cloud_tag:
             logger.debug("cloud plugin - Requests lib is not installed")
-            self.stop()
             return False
 
         cloud = self.determine_cloud_provider()
-
+        timeout = 1
         if cloud == self.AWS:
             r_url = self.AWS_EC2_API_URL
             try:
-                r = requests.get(r_url, timeout=3)
+                r = requests.get(r_url, timeout=timeout)
                 if r.ok:
                     document = json.loads(r.content)
                     self._stats['privateIp'] = document['privateIp']
@@ -235,7 +201,7 @@ class ThreadAwsEc2Grabber(threading.Thread):
             try:
                 headers = {}
                 headers['Metadata'] = "true"
-                r = requests.get(r_url, headers=headers, timeout=3)
+                r = requests.get(r_url, headers=headers, timeout=timeout)
                 if r.ok:
                     document = json.loads(r.content)
                     self._stats['compute'] = document['compute']
@@ -251,7 +217,7 @@ class ThreadAwsEc2Grabber(threading.Thread):
                     headers = {}
                     headers['Metadata-Flavor'] = "Google"
                     # Local request, a timeout of 3 seconds is OK
-                    r = requests.get(r_url, headers=headers, timeout=3)
+                    r = requests.get(r_url, headers=headers, timeout=timeout)
                     if r.ok:
                         self._stats[k] = r.content
                 except Exception as e:
@@ -279,7 +245,7 @@ class ThreadAwsEc2Grabber(threading.Thread):
                 r_url = '{}/{}'.format(self.ALIBABA_VM_API_URL, v)
                 try:
                     headers = {}
-                    r = requests.get(r_url, headers=headers, timeout=3)
+                    r = requests.get(r_url, headers=headers, timeout=timeout)
                     if r.ok:
                         self._stats[k] = r.content
                 except Exception as e:
@@ -297,16 +263,9 @@ class ThreadAwsEc2Grabber(threading.Thread):
         """Stats setter"""
         self._stats = value
 
-    def stop(self, timeout=None):
-        """Stop the thread"""
-        logger.debug("cloud plugin - Close thread for AWS EC2")
-        self._stopper.set()
-
-    def stopped(self):
-        """Return True is the thread is stopped"""
-        return self._stopper.isSet()
 
     def determine_cloud_provider(self):
+        timeout = 0.1
         for url in [self.AWS_EC2_API_URL_CHECK, self.AZURE_VM_API_URL_CHECK, self.GCP_VM_API_URL_CHECK, self.OPC_VM_API_URL_CHECK, self.ALIBABA_VM_API_URL_CHECK]:
             headers = {}
             if url == self.AZURE_VM_API_URL_CHECK:
@@ -314,7 +273,7 @@ class ThreadAwsEc2Grabber(threading.Thread):
             elif url == self.GCP_VM_API_URL_CHECK:
                 headers['Metadata-Flavor'] = "Google"
             try:
-                r = requests.get(url, headers=headers, timeout=0.1)
+                r = requests.get(url, headers=headers, timeout=timeout)
                 if r.ok:
                     if url == self.AWS_EC2_API_URL_CHECK:
                         return self.AWS

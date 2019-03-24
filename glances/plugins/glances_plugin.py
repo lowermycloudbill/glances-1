@@ -107,7 +107,10 @@ class GlancesPlugin(object):
 
     def get_init_value(self):
         """Return a copy of the init value."""
-        return copy.copy(self.stats_init_value)
+        if self.stats_init_value == {}:
+            return {}
+        else:
+            return []
 
     def reset(self):
         """Reset the stats.
@@ -126,7 +129,7 @@ class GlancesPlugin(object):
 
     def get_stats_size(self):
         """Return the size of stats"""
-        if self.stats:
+        if self.stats and isinstance(self.stats, list):
             return len(self.stats)
         return 0
 
