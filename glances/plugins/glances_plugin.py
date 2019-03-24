@@ -114,7 +114,10 @@ class GlancesPlugin(object):
 
         This method should be overwrited by childs' classes.
         """
-        self.stats = self.get_init_value()
+        if self.stats and self.stats_init_value == {}:
+            self.stats = {}
+        elif self.stats and self.stats_init_value == []:
+            self.stats = []
 
     def exit(self):
         """Just log an event when Glances exit."""

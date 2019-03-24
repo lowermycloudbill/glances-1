@@ -22,11 +22,12 @@
 import collections
 import os
 import sys
-import threading
 import traceback
 
 from glances.globals import exports_path, plugins_path, sys_path
 from glances.logger import logger
+
+from memory_profiler import profile
 
 
 class GlancesStats(object):
@@ -209,6 +210,8 @@ class GlancesStats(object):
         for p in self._plugins:
             self._plugins[p].load_limits(config)
 
+    fp = open('/tmp/memory_profiler_stats_update.log', 'w+')
+    @profile(stream=fp, precision=4)
     def update(self):
         """Wrapper method to update the stats."""
         # For standalone and server modes
@@ -220,11 +223,9 @@ class GlancesStats(object):
                 continue
             # Update the stats...
             self._plugins[p].update()
-            # ... the history
-            # self._plugins[p].update_stats_history()
-            # ... and the views
-            # self._plugins[p].update_views()
 
+    fp = open('/tmp/memory_profiler_stats_export.log', 'w+')
+    @profile(stream=fp, precision=4)
     def export(self, input_stats=None):
         """Export all the stats.
 
@@ -234,11 +235,21 @@ class GlancesStats(object):
         input_stats = input_stats or {}
 
         for e in self._exports:
-            logger.debug("Export stats using the %s module" % e)
-            thread = threading.Thread(target=self._exports[e].update,
-                                      args=(input_stats,))
-            # threads.append(thread)
-            thread.start()
+            self._exports[e].update(input_stats)
+
+    fp = open('/tmp/memory_profiler_stats_reset.log', 'w+')
+    @profile(stream=fp, precision=4)
+    def reset(self):
+        """Wrapper method to reset the stats."""
+        # For standalone and server modes
+        # For each plugins, call the reset method
+        for p in self._plugins:
+            if self._plugins[p].is_disable():
+                # If current plugin is disable
+                # then continue to next plugin
+                continue
+            # Reset the stats...
+            self._plugins[p].reset()
 
     def getAll(self):
         """Return all the stats (list)."""

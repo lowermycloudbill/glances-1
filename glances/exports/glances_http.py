@@ -71,6 +71,7 @@ class Export(GlancesExportBulk):
       self.bulk[name] = data
 
     def flush(self):
+      timeout = 5
       self.bulk['metadata'] = self.metadata
       self.bulk['sent_at'] = str(datetime.datetime.utcnow())
       if 'TEST' in os.environ:
@@ -79,5 +80,8 @@ class Export(GlancesExportBulk):
         f.close()
         os._exit(0)
       else:
-        r = requests.post(self.http_endpoint, json=self.bulk, headers=self.headers)
+        try:
+            r = requests.post(self.http_endpoint, json=self.bulk, headers=self.headers, timeout=timeout)
+        except Exception as e:
+            logger.debug('export http - Cannot connect to the endpoint {}: {}'.format(self.http_endpoint, e))
       self.bulk = {}

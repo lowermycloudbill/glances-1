@@ -124,6 +124,11 @@ class GlancesStandalone(object):
         self.stats.export(self.stats)
         logger.debug('Stats exported in {} seconds'.format(counter_export.get()))
 
+
+        counter_reset = Counter()
+        self.stats.reset()
+        logger.debug('Stats reset in {} seconds'.format(counter_export.get()))
+
         # Patch for issue1326 to avoid < 0 refresh
         adapted_refresh = self.refresh_time - counter.get()
         adapted_refresh = adapted_refresh if adapted_refresh > 0 else 0
