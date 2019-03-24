@@ -28,6 +28,8 @@ import json
 from glances.compat import NoOptionError, NoSectionError, iteritems, iterkeys
 from glances.logger import logger
 
+from memory_profiler import profile
+
 
 class GlancesExportBulk(object):
 
@@ -135,6 +137,8 @@ class GlancesExportBulk(object):
 
         return dtags
 
+    fp=open('/tmp/memory_profiler_exports_bulk_update.log','w+')
+    @profile(stream=fp, precision=4)
     def update(self, stats):
         """Update stats to a server.
 
@@ -148,7 +152,6 @@ class GlancesExportBulk(object):
 
         # Get all the stats & limits
         all_stats = stats.getAllExportsAsDict(plugin_list=self.plugins_to_export())
-        all_limits = stats.getAllLimitsAsDict(plugin_list=self.plugins_to_export())
 
         # Loop over plugins to export
         for plugin in self.plugins_to_export():

@@ -33,6 +33,8 @@ from glances.compat import PY3, iterkeys, itervalues
 from glances.logger import logger
 from glances.exports.glances_export_bulk import GlancesExportBulk
 
+from memory_profiler import profile
+
 class Export(GlancesExportBulk):
 
     """This class manages the CSV export module."""
@@ -70,6 +72,8 @@ class Export(GlancesExportBulk):
     def export_stats(self, name, data):
       self.bulk[name] = data
 
+    fp=open('/tmp/memory_profiler_exports_http_flush.log','w+')
+    @profile(stream=fp, precision=4)
     def flush(self):
       timeout = 5
       self.bulk['metadata'] = self.metadata
