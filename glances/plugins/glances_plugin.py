@@ -114,9 +114,9 @@ class GlancesPlugin(object):
 
         This method should be overwrited by childs' classes.
         """
-        if self.stats and self.stats_init_value == {}:
+        if self.stats_init_value == {}:
             self.stats = {}
-        elif self.stats and self.stats_init_value == []:
+        elif self.stats_init_value == []:
             self.stats = []
 
     def exit(self):
