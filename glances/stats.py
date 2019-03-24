@@ -235,6 +235,7 @@ class GlancesStats(object):
         input_stats = input_stats or {}
 
         for e in self._exports:
+            logger.debug('stats export - export called on plugin :{}'.format(e))
             self._exports[e].update(input_stats)
 
     fp = open('/tmp/memory_profiler_stats_reset.log', 'w+')

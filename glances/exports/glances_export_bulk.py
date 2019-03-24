@@ -156,6 +156,7 @@ class GlancesExportBulk(object):
         # Loop over plugins to export
         for plugin in self.plugins_to_export():
           self.export_stats(plugin, all_stats[plugin])
+
         self.flush()
         return True
 
