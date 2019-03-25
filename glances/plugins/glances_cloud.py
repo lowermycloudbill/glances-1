@@ -25,7 +25,7 @@ Supported Cloud API:
 """
 
 try:
-    import requests
+    import urllib3
 except ImportError:
     cloud_tag = False
 else:
@@ -138,7 +138,8 @@ class Plugin(GlancesPlugin):
         if cloud == self.AWS:
             r_url = self.AWS_EC2_API_URL
             try:
-                r = requests.get(r_url, timeout=timeout)
+                http = urllib3.PoolManager()
+                r = http.request('GET', r_url, timeout=timeout)
                 if r.ok:
                     document = json.loads(r.content)
                     self.stats['privateIp'] = document['privateIp']
@@ -164,7 +165,8 @@ class Plugin(GlancesPlugin):
             try:
                 headers = {}
                 headers['Metadata'] = "true"
-                r = requests.get(r_url, headers=headers, timeout=timeout)
+                http = urllib3.PoolManager()
+                r = http.request('GET', r_url, headers=headers, timeout=timeout)
                 if r.ok:
                     document = json.loads(r.content)
                     self.stats['compute'] = document['compute']
@@ -180,7 +182,8 @@ class Plugin(GlancesPlugin):
                     headers = {}
                     headers['Metadata-Flavor'] = "Google"
                     # Local request, a timeout of 3 seconds is OK
-                    r = requests.get(r_url, headers=headers, timeout=timeout)
+                    http = urllib3.PoolManager()
+                    r = http.request('GET', r_url, headers=headers, timeout=timeout)
                     if r.ok:
                         self.stats[k] = r.content
                 except Exception as e:
@@ -189,7 +192,8 @@ class Plugin(GlancesPlugin):
             self.stats['type'] = self.OPC
             r_url = self.OPC_VM_API_URL
             try:
-                r = requests.get(r_url, timeout=timeout)
+                http = urllib3.PoolManager()
+                r = http.request('GET', r_url, timeout=timeout)
                 if r.ok:
                     document = json.loads(r.content)
                     self.stats['id'] = document['id']
@@ -208,7 +212,8 @@ class Plugin(GlancesPlugin):
                 r_url = '{}/{}'.format(self.ALIBABA_VM_API_URL, v)
                 try:
                     headers = {}
-                    r = requests.get(r_url, headers=headers, timeout=timeout)
+                    http = urllib3.PoolManager()
+                    r = http.request('GET', r_url, headers=headers, timeout=timeout)
                     if r.ok:
                         self.stats[k] = r.content
                 except Exception as e:
@@ -244,7 +249,8 @@ class Plugin(GlancesPlugin):
             elif url == self.GCP_VM_API_URL_CHECK:
                 headers['Metadata-Flavor'] = "Google"
             try:
-                r = requests.get(url, headers=headers, timeout=0.1)
+                http = urllib3.PoolManager()
+                r = http.request('GET', url, headers=headers, timeout=0.1)
                 if r.ok:
                     if url == self.AWS_EC2_API_URL_CHECK:
                         return self.AWS
