@@ -23,7 +23,7 @@ import csv
 import sys
 import time
 import json
-import requests
+import urllib3
 import datetime
 import ConfigParser
 from numbers import Number
@@ -85,7 +85,9 @@ class Export(GlancesExportBulk):
         os._exit(0)
       else:
         try:
-            r = requests.post(self.http_endpoint, json=self.bulk, headers=self.headers, timeout=timeout)
+            http = urllib3.PoolManager()
+            encoded_body = json.dumps(self.bulk)
+            http.request('POST', self.http_endpoint, headers=self.headers, body=encoded_body, timeout=timeout)
         except Exception as e:
             logger.debug('export http - Cannot connect to the endpoint {}: {}'.format(self.http_endpoint, e))
       self.bulk = {}
