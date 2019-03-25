@@ -60,6 +60,7 @@ class Export(GlancesExportBulk):
         headers = {
           'apikey' : self.api_key,
           'host' : self.host,
+          'Content-Type': 'application/json'
         }
 
         self.metadata = metadata
