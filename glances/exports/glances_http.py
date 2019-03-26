@@ -27,7 +27,7 @@ import urllib3
 import datetime
 import ConfigParser
 try:
-    import cjson as json
+    import ujson as json
 except ImportError:
     import json
 

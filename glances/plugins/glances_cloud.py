@@ -32,7 +32,7 @@ else:
     cloud_tag = True
 
 try:
-    import cjson as json
+    import ujson as json
 except Exception:
     import json
 
