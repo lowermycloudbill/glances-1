@@ -44,7 +44,7 @@ class GlancesMain(object):
     """Main class to manage Glances instance."""
 
     # Default stats' refresh time is 3 seconds
-    refresh_time = 30
+    refresh_time = 60
     # Set the default cache lifetime to 1 second (only for server)
     cached_time = 1
     # By default, Glances is ran in standalone mode (no client/server)
