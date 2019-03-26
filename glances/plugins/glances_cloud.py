@@ -146,7 +146,7 @@ class Plugin(GlancesPlugin):
             try:
                 headers = {}
                 session = sessions.Session()
-                r = session.request(method='GET', url=self.http_endpoint, headers=headers, timeout=timeout)
+                r = session.request(method='GET', url=r_url, headers=headers, timeout=timeout)
                 session.close()
                 if r.ok:
                     document = r.content
@@ -173,7 +173,7 @@ class Plugin(GlancesPlugin):
             try:
                 headers = {}
                 session = sessions.Session()
-                r = session.request(method='GET', url=self.http_endpoint, headers=headers, timeout=timeout)
+                r = session.request(method='GET', url=r_url, headers=headers, timeout=timeout)
                 session.close()
                 if r.ok:
                     document = json.loads(r.content)
@@ -191,7 +191,7 @@ class Plugin(GlancesPlugin):
                     headers['Metadata-Flavor'] = "Google"
                     # Local request, a timeout of 3 seconds is OK
                     session = sessions.Session()
-                    r = session.request(method='GET', url=self.http_endpoint, headers=headers, timeout=timeout)
+                    r = session.request(method='GET', url=r_url, headers=headers, timeout=timeout)
                     session.close()
                     if r.ok:
                         self.stats[k] = r.content
@@ -203,7 +203,7 @@ class Plugin(GlancesPlugin):
             try:
                 headers = {}
                 session = sessions.Session()
-                r = session.request(method='GET', url=self.http_endpoint, headers=headers, timeout=timeout)
+                r = session.request(method='GET', url=r_url, headers=headers, timeout=timeout)
                 session.close()
                 if r.ok:
                     document = json.loads(r.content)
@@ -224,7 +224,7 @@ class Plugin(GlancesPlugin):
                 try:
                     headers = {}
                     session = sessions.Session()
-                    r = session.request(method='GET', url=self.http_endpoint, headers=headers, timeout=timeout)
+                    r = session.request(method='GET', url=r_url, headers=headers, timeout=timeout)
                     session.close()
                     if r.ok:
                         self.stats[k] = r.content
