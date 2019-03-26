@@ -149,7 +149,7 @@ class Plugin(GlancesPlugin):
                 r = session.request(method='GET', url=self.http_endpoint, headers=headers, timeout=timeout)
                 session.close()
                 if r.ok:
-                    document = json.loads(r.content)
+                    document = r.content
                     self.stats['privateIp'] = document['privateIp']
                     self.stats['devpayProductCodes'] = document['devpayProductCodes']
                     self.stats['marketplaceProductCodes'] = document['marketplaceProductCodes']
@@ -266,9 +266,10 @@ class Plugin(GlancesPlugin):
             elif url == self.GCP_VM_API_URL_CHECK:
                 headers['Metadata-Flavor'] = "Google"
             try:
-                http = urllib3.PoolManager()
-                r = http.request('GET', url, headers=headers, timeout=0.1)
-                if r.status == 200:
+                session = sessions.Session()
+                r = session.request(method='GET', url=url, headers=headers, timeout=0.1)
+                session.close()
+                if r.ok:
                     if url == self.AWS_EC2_API_URL_CHECK:
                         return self.AWS
                     elif url == self.AZURE_VM_API_URL_CHECK:
