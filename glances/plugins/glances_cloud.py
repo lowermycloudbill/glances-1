@@ -25,7 +25,7 @@ Supported Cloud API:
 """
 
 try:
-    import urllib3
+    from requests import sessions
 except ImportError:
     cloud_tag = False
 else:
@@ -131,19 +131,25 @@ class Plugin(GlancesPlugin):
     @GlancesPlugin._log_result_decorator
     @profile(stream=fp, precision=4)
     def update(self):
+        """Function called to grab stats.
+                Infinite loop, should be stopped by calling the stop() method"""
+
         if not cloud_tag:
             logger.debug("cloud plugin - Requests lib is not installed")
-            return {}
+            self.stop()
+            return False
 
         cloud = self.determine_cloud_provider()
         timeout = 3
         if cloud == self.AWS:
             r_url = self.AWS_EC2_API_URL
             try:
-                http = urllib3.PoolManager()
-                r = http.request('GET', r_url, timeout=timeout)
-                if r.status == 200:
-                    document = json.loads(r.data)
+                headers = {}
+                session = sessions.Session()
+                r = session.request(method='GET', url=self.http_endpoint, headers=headers, timeout=timeout)
+                session.close()
+                if r.ok:
+                    document = json.loads(r.content)
                     self.stats['privateIp'] = document['privateIp']
                     self.stats['devpayProductCodes'] = document['devpayProductCodes']
                     self.stats['marketplaceProductCodes'] = document['marketplaceProductCodes']
@@ -166,11 +172,11 @@ class Plugin(GlancesPlugin):
             r_url = self.AZURE_VM_API_URL
             try:
                 headers = {}
-                headers['Metadata'] = "true"
-                http = urllib3.PoolManager()
-                r = http.request('GET', r_url, headers=headers, timeout=timeout)
-                if r.status == 200:
-                    document = json.loads(r.data)
+                session = sessions.Session()
+                r = session.request(method='GET', url=self.http_endpoint, headers=headers, timeout=timeout)
+                session.close()
+                if r.ok:
+                    document = json.loads(r.content)
                     self.stats['compute'] = document['compute']
                     self.stats['network'] = document['network']
                     self.stats['type'] = self.AZURE
@@ -184,20 +190,23 @@ class Plugin(GlancesPlugin):
                     headers = {}
                     headers['Metadata-Flavor'] = "Google"
                     # Local request, a timeout of 3 seconds is OK
-                    http = urllib3.PoolManager()
-                    r = http.request('GET', r_url, headers=headers, timeout=timeout)
-                    if r.status == 200:
-                        self.stats[k] = r.data
+                    session = sessions.Session()
+                    r = session.request(method='GET', url=self.http_endpoint, headers=headers, timeout=timeout)
+                    session.close()
+                    if r.ok:
+                        self.stats[k] = r.content
                 except Exception as e:
                     logger.debug('cloud plugin - Cannot connect to the GCP VM API {}: {}'.format(r_url, e))
         elif cloud == self.OPC:
             self.stats['type'] = self.OPC
             r_url = self.OPC_VM_API_URL
             try:
-                http = urllib3.PoolManager()
-                r = http.request('GET', r_url, timeout=timeout)
-                if r.status == 200:
-                    document = json.loads(r.data)
+                headers = {}
+                session = sessions.Session()
+                r = session.request(method='GET', url=self.http_endpoint, headers=headers, timeout=timeout)
+                session.close()
+                if r.ok:
+                    document = json.loads(r.content)
                     self.stats['id'] = document['id']
                     self.stats['displayName'] = document['displayName']
                     self.stats['compartmentId'] = document['compartmentId']
@@ -214,13 +223,15 @@ class Plugin(GlancesPlugin):
                 r_url = '{}/{}'.format(self.ALIBABA_VM_API_URL, v)
                 try:
                     headers = {}
-                    http = urllib3.PoolManager()
-                    r = http.request('GET', r_url, headers=headers, timeout=timeout)
-                    if r.status == 200:
-                        self.stats[k] = r.data
+                    session = sessions.Session()
+                    r = session.request(method='GET', url=self.http_endpoint, headers=headers, timeout=timeout)
+                    session.close()
+                    if r.ok:
+                        self.stats[k] = r.content
                 except Exception as e:
                     logger.debug('cloud plugin - Cannot connect to the ALIBABA VM API {}: {}'.format(r_url, e))
                     self.stats[k] = to_ascii(r.content)
+        return True
         return self.stats
 
     def msg_curse(self, args=None):

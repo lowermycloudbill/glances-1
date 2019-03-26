@@ -19,20 +19,15 @@
 
 """CloudAdmin HTTP interface class."""
 import os
-import csv
-import sys
-import time
-import json
-import urllib3
+from requests import sessions
 import datetime
 import ConfigParser
 try:
-    import cjson as json
+    import ujson as json
 except ImportError:
     import json
 
 from glances import __version__
-from glances.compat import PY3, iterkeys, itervalues
 from glances.logger import logger
 from glances.exports.glances_export_bulk import GlancesExportBulk
 
@@ -89,9 +84,10 @@ class Export(GlancesExportBulk):
         os._exit(0)
       else:
         try:
-            http = urllib3.PoolManager()
+            session = sessions.Session()
             encoded_body = json.dumps(self.bulk)
-            http.request('POST', self.http_endpoint, headers=self.headers, body=encoded_body, timeout=timeout)
+            session.request(method='POST', url=self.http_endpoint, headers=self.headers, data=encoded_body, timeout=timeout)
+            session.close()
         except Exception as e:
             logger.debug('export http - Cannot connect to the endpoint {}: {}'.format(self.http_endpoint, e))
       self.bulk = {}
