@@ -31,8 +31,10 @@ except ImportError:
 else:
     cloud_tag = True
 
-import json
-import threading
+try:
+    import cjson as json
+except ImportError:
+    import json
 
 from memory_profiler import profile
 from glances.compat import iteritems, to_ascii

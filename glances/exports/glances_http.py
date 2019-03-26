@@ -26,7 +26,10 @@ import json
 import urllib3
 import datetime
 import ConfigParser
-from numbers import Number
+try:
+    import cjson as json
+except ImportError:
+    import json
 
 from glances import __version__
 from glances.compat import PY3, iterkeys, itervalues
