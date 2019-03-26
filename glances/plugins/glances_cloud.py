@@ -246,27 +246,12 @@ class Plugin(GlancesPlugin):
     @GlancesPlugin._log_result_decorator
     @profile(stream=fp, precision=4)
     def determine_cloud_provider(self):
-        for url in [self.AWS_EC2_API_URL_CHECK, self.AZURE_VM_API_URL_CHECK, self.GCP_VM_API_URL_CHECK, self.OPC_VM_API_URL_CHECK, self.ALIBABA_VM_API_URL_CHECK]:
-            headers = {}
-            if url == self.AZURE_VM_API_URL_CHECK:
-                headers['Metadata'] = "true"
-            elif url == self.GCP_VM_API_URL_CHECK:
-                headers['Metadata-Flavor'] = "Google"
-            try:
-                http = urllib3.PoolManager()
-                r = http.request('GET', url, headers=headers, timeout=0.1)
-                if r.status == 200:
-                    if url == self.AWS_EC2_API_URL_CHECK:
-                        return self.AWS
-                    elif url == self.AZURE_VM_API_URL_CHECK:
-                        return self.AZURE
-                    elif url == self.GCP_VM_API_URL_CHECK:
-                        return self.GCP
-                    elif url == self.OPC_VM_API_URL_CHECK:
-                        return self.OPC
-                    elif url == self.ALIBABA_VM_API_URL_CHECK:
-                        return self.ALIBABA
-            except Exception as e:
+        headers = {}
+        try:
+            http = urllib3.PoolManager()
+            r = http.request('GET', url, headers=headers, timeout=0.1)
+            if r.status == 200:
+                return self.AWS
+        except Exception as e:
                 pass
         return None
-
