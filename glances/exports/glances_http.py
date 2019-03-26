@@ -91,7 +91,9 @@ class Export(GlancesExportBulk):
         try:
             http = urllib3.PoolManager()
             encoded_body = json.dumps(self.bulk)
-            http.request('POST', self.http_endpoint, headers=self.headers, body=encoded_body, timeout=timeout)
+            response = http.request('POST', self.http_endpoint, headers=self.headers, body=encoded_body, timeout=timeout)
+            response.close()
+            del http
         except Exception as e:
             logger.debug('export http - Cannot connect to the endpoint {}: {}'.format(self.http_endpoint, e))
       self.bulk = {}
