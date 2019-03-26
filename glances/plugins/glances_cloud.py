@@ -255,7 +255,7 @@ class Plugin(GlancesPlugin):
             try:
                 http = urllib3.PoolManager()
                 r = http.request('GET', url, headers=headers, timeout=0.1)
-                if r.ok:
+                if r.status == 200:
                     if url == self.AWS_EC2_API_URL_CHECK:
                         return self.AWS
                     elif url == self.AZURE_VM_API_URL_CHECK:
