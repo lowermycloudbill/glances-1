@@ -254,6 +254,11 @@ class GlancesStats(object):
                 # If current plugin is disable
                 # then continue to next plugin
                 continue
+
+            # skip cloud plugin
+            if p == 'cloud' and self._plugins[p].did_run_successfully():
+                continue
+
             # Reset the stats...
             self._plugins[p].reset()
 
