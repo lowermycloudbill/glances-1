@@ -33,7 +33,7 @@ else:
 
 try:
     import cjson as json
-except ImportError:
+except Exception:
     import json
 
 from memory_profiler import profile
