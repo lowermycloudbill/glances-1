@@ -119,6 +119,8 @@ class Plugin(GlancesPlugin):
         # We want to display the stat in the curse interface
         self.display_curse = True
 
+        self.ran_successfully = False
+
         # Init the stats
         self.reset()
 
@@ -160,6 +162,7 @@ class Plugin(GlancesPlugin):
                     self.stats['pendingTime'] = document['pendingTime']
                     self.stats['region'] = document['region']
                     self.stats['type'] = self.AWS
+                    self.ran_successfully = True
             except Exception as e:
                 logger.debug('cloud plugin - Cannot connect to the AWS EC2 API {}: {}'.format(r_url, e))
         elif cloud == self.AZURE:
@@ -174,6 +177,7 @@ class Plugin(GlancesPlugin):
                     self.stats['compute'] = document['compute']
                     self.stats['network'] = document['network']
                     self.stats['type'] = self.AZURE
+                    self.ran_successfully = True
             except Exception as e:
                 logger.debug('cloud plugin - Cannot connect to the AZURE VM API {}: {}'.format(r_url, e))
         elif cloud == self.GCP:
@@ -188,6 +192,7 @@ class Plugin(GlancesPlugin):
                     r = http.request('GET', r_url, headers=headers, timeout=timeout)
                     if r.status == 200:
                         self.stats[k] = r.data
+                        self.ran_successfully = True
                 except Exception as e:
                     logger.debug('cloud plugin - Cannot connect to the GCP VM API {}: {}'.format(r_url, e))
         elif cloud == self.OPC:
@@ -206,6 +211,7 @@ class Plugin(GlancesPlugin):
                     self.stats['availabilityDomain'] = document['availabilityDomain']
                     self.stats['timeCreated'] = document['timeCreated']
                     self.stats['image'] = document['image']
+                    self.ran_successfully = True
             except Exception as e:
                 logger.debug('cloud plugin - Cannot connect to the OPC VM API {}: {}'.format(r_url, e))
         elif cloud == self.ALIBABA:
@@ -218,10 +224,14 @@ class Plugin(GlancesPlugin):
                     r = http.request('GET', r_url, headers=headers, timeout=timeout)
                     if r.status == 200:
                         self.stats[k] = r.data
+                        self.ran_successfully = True
                 except Exception as e:
                     logger.debug('cloud plugin - Cannot connect to the ALIBABA VM API {}: {}'.format(r_url, e))
                     self.stats[k] = to_ascii(r.content)
         return self.stats
+
+    def did_run_successfully(self):
+        return self.ran_successfully
 
     def msg_curse(self, args=None):
         """Return the string to display in the curse interface."""
