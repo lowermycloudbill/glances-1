@@ -19,11 +19,8 @@
 
 """CloudAdmin HTTP interface class."""
 import os
-import csv
-import sys
-import time
 import json
-import urllib3
+import requests
 import datetime
 import ConfigParser
 try:
@@ -62,8 +59,7 @@ class Export(GlancesExportBulk):
 
         headers = {
           'apikey' : self.api_key,
-          'host' : self.host,
-          'Content-Type': 'application/json'
+          'host' : self.host
         }
 
         self.metadata = metadata
@@ -89,11 +85,7 @@ class Export(GlancesExportBulk):
         os._exit(0)
       else:
         try:
-            http = urllib3.PoolManager()
-            encoded_body = json.dumps(self.bulk)
-            response = http.request('POST', self.http_endpoint, headers=self.headers, body=encoded_body, timeout=timeout)
-            response.close()
-            del http
+            r = requests.post(self.http_endpoint, json=self.bulk, headers=self.headers, timeout=timeout)
         except Exception as e:
             logger.debug('export http - Cannot connect to the endpoint {}: {}'.format(self.http_endpoint, e))
       self.bulk = {}

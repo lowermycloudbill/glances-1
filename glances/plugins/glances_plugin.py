@@ -114,10 +114,7 @@ class GlancesPlugin(object):
 
         This method should be overwrited by childs' classes.
         """
-        if self.stats_init_value == {}:
-            self.stats = {}
-        elif self.stats_init_value == []:
-            self.stats = []
+        self.stats = self.get_init_value()
 
     def exit(self):
         """Just log an event when Glances exit."""
@@ -391,9 +388,6 @@ class GlancesPlugin(object):
                 return None
         elif isinstance(self.stats, list):
             try:
-                # Source:
-                # http://stackoverflow.com/questions/4573875/python-get-index-of-dictionary-item-in-list
-                # But https://github.com/nicolargo/glances/issues/1401
                 return self._json_dumps({item: map(itemgetter(item), self.stats)})
             except (KeyError, ValueError) as e:
                 logger.error("Cannot get item {} ({})".format(item, e))
