@@ -25,7 +25,7 @@ Supported Cloud API:
 """
 
 try:
-    import urllib3
+    import requests
 except ImportError:
     cloud_tag = False
 else:
@@ -209,8 +209,8 @@ class ThreadAwsEc2Grabber(threading.Thread):
         if cloud == self.AWS:
             r_url = self.AWS_EC2_API_URL
             try:
-                http = urllib3.PoolManager()
-                r = http.request('GET', r_url, timeout=3)
+                headers = {}
+                r = requests.get(r_url, headers=headers, timeout=3)
                 if r.ok:
                     document = json.loads(r.content)
                     self._stats['privateIp'] = document['privateIp']
@@ -236,8 +236,7 @@ class ThreadAwsEc2Grabber(threading.Thread):
             try:
                 headers = {}
                 headers['Metadata'] = "true"
-                http = urllib3.PoolManager()
-                r = http.request('GET', r_url, headers=headers, timeout=3)
+                r = requests.get(r_url, headers=headers, timeout=3)
                 if r.ok:
                     document = json.loads(r.content)
                     self._stats['compute'] = document['compute']
@@ -253,8 +252,7 @@ class ThreadAwsEc2Grabber(threading.Thread):
                     headers = {}
                     headers['Metadata-Flavor'] = "Google"
                     # Local request, a timeout of 3 seconds is OK
-                    http = urllib3.PoolManager()
-                    r = http.request('GET', r_url, headers=headers, timeout=3)
+                    r = requests.get(r_url, headers=headers, timeout=3)
                     if r.ok:
                         self._stats[k] = r.content
                 except Exception as e:
@@ -263,8 +261,8 @@ class ThreadAwsEc2Grabber(threading.Thread):
             self._stats['type'] = self.OPC
             r_url = self.OPC_VM_API_URL
             try:
-                http = urllib3.PoolManager()
-                r = http.request('GET', r_url, timeout=3)
+                headers = {}
+                r = requests.get(r_url, headers=headers, timeout=3)
                 if r.ok:
                     document = json.loads(r.content)
                     self._stats['id'] = document['id']
@@ -283,8 +281,7 @@ class ThreadAwsEc2Grabber(threading.Thread):
                 r_url = '{}/{}'.format(self.ALIBABA_VM_API_URL, v)
                 try:
                     headers = {}
-                    http = urllib3.PoolManager()
-                    r = http.request('GET', r_url, headers=headers, timeout=3)
+                    r = requests.get(r_url, headers=headers, timeout=3)
                     if r.ok:
                         self._stats[k] = r.content
                 except Exception as e:
@@ -319,8 +316,7 @@ class ThreadAwsEc2Grabber(threading.Thread):
             elif url == self.GCP_VM_API_URL_CHECK:
                 headers['Metadata-Flavor'] = "Google"
             try:
-                http = urllib3.PoolManager()
-                r = http.request('GET', url, headers=headers, timeout=0.1)
+                r = requests.get(url, headers=headers, timeout=3)
                 if r.ok:
                     if url == self.AWS_EC2_API_URL_CHECK:
                         return self.AWS
