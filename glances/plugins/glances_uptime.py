@@ -24,7 +24,6 @@ from datetime import datetime, timedelta
 from glances.plugins.glances_plugin import GlancesPlugin
 
 import psutil
-from memory_profiler import profile
 
 # SNMP OID
 snmp_oid = {'_uptime': '1.3.6.1.2.1.1.3.0'}
@@ -58,10 +57,8 @@ class Plugin(GlancesPlugin):
         # Correct issue #1092 (thanks to @IanTAtWork)
         return {'seconds': int(self.uptime.total_seconds())}
 
-    fp=open('/tmp/memory_profiler_stats_uptime.log','w+')
     @GlancesPlugin._check_decorator
     @GlancesPlugin._log_result_decorator
-    @profile(stream=fp, precision=4)
     def update(self):
         """Update uptime stat using the input method."""
         # Init new stats

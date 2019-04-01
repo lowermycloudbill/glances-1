@@ -22,7 +22,6 @@
 from glances.plugins.glances_plugin import GlancesPlugin
 
 import psutil
-from memory_profiler import profile
 
 
 class Plugin(GlancesPlugin):
@@ -41,8 +40,6 @@ class Plugin(GlancesPlugin):
         # The core number is displayed by the load plugin
         self.display_curse = False
 
-    fp=open('/tmp/memory_profiler_stats_core.log','w+')
-    @profile(stream=fp, precision=4)
     def update(self):
         """Update core stats.
 

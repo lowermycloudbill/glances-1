@@ -33,7 +33,6 @@ from glances.timer import Timer, Counter
 from glances.compat import bool_type
 from glances.logger import logger
 from glances.plugins.glances_plugin import GlancesPlugin
-from memory_profiler import profile
 
 try:
     import requests
@@ -72,9 +71,7 @@ class Plugin(GlancesPlugin):
         # Call the father class
         super(Plugin, self).exit()
 
-    fp=open('/tmp/memory_profiler_stats_ports.log','w+')
     @GlancesPlugin._log_result_decorator
-    @profile(stream=fp, precision=4)
     def update(self):
         """Update the ports list."""
         if self.input_method == 'local':

@@ -36,7 +36,6 @@ try:
 except Exception:
     import json
 
-from memory_profiler import profile
 from glances.compat import iteritems, to_ascii
 from glances.plugins.glances_plugin import GlancesPlugin
 from glances.logger import logger
@@ -128,10 +127,8 @@ class Plugin(GlancesPlugin):
         """Reset/init the stats."""
         self.stats = {}
 
-    fp = open('/tmp/memory_profiler_stats_cloud.log', 'w+')
     @GlancesPlugin._check_decorator
     @GlancesPlugin._log_result_decorator
-    @profile(stream=fp, precision=4)
     def update(self):
         if not cloud_tag:
             logger.debug("cloud plugin - Requests lib is not installed")
@@ -253,10 +250,8 @@ class Plugin(GlancesPlugin):
         logger.info(ret)
         return ret
 
-    fp = open('/tmp/memory_profiler_stats_cloud__determine_cloud_provider.log', 'w+')
     @GlancesPlugin._check_decorator
     @GlancesPlugin._log_result_decorator
-    @profile(stream=fp, precision=4)
     def determine_cloud_provider(self):
         for url in [self.AWS_EC2_API_URL_CHECK, self.AZURE_VM_API_URL_CHECK, self.GCP_VM_API_URL_CHECK, self.OPC_VM_API_URL_CHECK, self.ALIBABA_VM_API_URL_CHECK]:
             headers = {}

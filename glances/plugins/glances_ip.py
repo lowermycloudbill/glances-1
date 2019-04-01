@@ -26,7 +26,6 @@ from glances.compat import iterkeys, urlopen, queue
 from glances.logger import logger
 from glances.timer import Timer
 from glances.plugins.glances_plugin import GlancesPlugin
-from memory_profiler import profile
 
 # Import plugin specific dependency
 try:
@@ -65,10 +64,8 @@ class Plugin(GlancesPlugin):
         if not self.is_disable():
             self.public_address = PublicIpAddress().get()
 
-    fp=open('/tmp/memory_profiler_stats_ip.log','w+')
     @GlancesPlugin._check_decorator
     @GlancesPlugin._log_result_decorator
-    @profile(stream=fp, precision=4)
     def update(self):
         """Update IP stats using the input method.
 

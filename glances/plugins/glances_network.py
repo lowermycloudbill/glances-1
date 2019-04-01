@@ -26,7 +26,6 @@ from glances.timer import getTimeSinceLastUpdate
 from glances.plugins.glances_plugin import GlancesPlugin
 
 import psutil
-from memory_profiler import profile
 
 # SNMP OID
 # http://www.net-snmp.org/docs/mibs/interfaces.html
@@ -63,10 +62,8 @@ class Plugin(GlancesPlugin):
         """Return the key of the list."""
         return 'interface_name'
 
-    fp = open('/tmp/memory_profiler_stats_network.log', 'w+')
     @GlancesPlugin._check_decorator
     @GlancesPlugin._log_result_decorator
-    @profile(stream=fp, precision=4)
     def update(self):
         """Update network stats using the input method.
 

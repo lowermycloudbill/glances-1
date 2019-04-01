@@ -19,10 +19,6 @@
 
 """CloudAdmin HTTP interface class."""
 import os
-import csv
-import sys
-import time
-import json
 import urllib3
 import datetime
 import ConfigParser
@@ -35,8 +31,6 @@ from glances import __version__
 from glances.compat import PY3, iterkeys, itervalues
 from glances.logger import logger
 from glances.exports.glances_export_bulk import GlancesExportBulk
-
-from memory_profiler import profile
 
 class Export(GlancesExportBulk):
 
@@ -76,8 +70,6 @@ class Export(GlancesExportBulk):
     def export_stats(self, name, data):
       self.bulk[name] = data
 
-    fp=open('/tmp/memory_profiler_exports_http_flush.log','w+')
-    @profile(stream=fp, precision=4)
     def flush(self):
       timeout = 5
       self.bulk['metadata'] = self.metadata

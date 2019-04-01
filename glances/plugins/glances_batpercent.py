@@ -23,7 +23,6 @@ import psutil
 
 from glances.logger import logger
 from glances.plugins.glances_plugin import GlancesPlugin
-from memory_profiler import profile
 
 # Batinfo library (optional; Linux-only)
 batinfo_tag = True
@@ -62,10 +61,8 @@ class Plugin(GlancesPlugin):
         # The HDD temp is displayed within the sensors plugin
         self.display_curse = False
 
-    fp=open('/tmp/memory_profiler_stats_batpercent.log','w+')
     @GlancesPlugin._check_decorator
     @GlancesPlugin._log_result_decorator
-    @profile(stream=fp, precision=4)
     def update(self):
         """Update battery capacity stats using the input method."""
         # Init new stats

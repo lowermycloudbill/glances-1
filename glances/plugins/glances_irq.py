@@ -25,7 +25,6 @@ import operator
 from glances.globals import LINUX
 from glances.timer import getTimeSinceLastUpdate
 from glances.plugins.glances_plugin import GlancesPlugin
-from memory_profiler import profile
 
 
 class Plugin(GlancesPlugin):
@@ -49,10 +48,8 @@ class Plugin(GlancesPlugin):
         """Return the key of the list."""
         return self.irq.get_key()
 
-    fp=open('/tmp/memory_profiler_stats_irq.log','w+')
     @GlancesPlugin._check_decorator
     @GlancesPlugin._log_result_decorator
-    @profile(stream=fp, precision=4)
     def update(self):
         """Update the IRQ stats."""
         # Init new stats

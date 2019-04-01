@@ -25,7 +25,6 @@ from glances.compat import u, nativestr
 from glances.plugins.glances_plugin import GlancesPlugin
 
 import psutil
-from memory_profiler import profile
 
 # SNMP OID
 # The snmpd.conf needs to be edited.
@@ -83,10 +82,8 @@ class Plugin(GlancesPlugin):
         """Return the key of the list."""
         return 'mnt_point'
 
-    fp=open('/tmp/memory_profiler_stats_fs.log','w+')
     @GlancesPlugin._check_decorator
     @GlancesPlugin._log_result_decorator
-    @profile(stream=fp, precision=4)
     def update(self):
         """Update the FS stats using the input method."""
         # Init new stats

@@ -25,7 +25,6 @@ from glances.compat import nativestr
 from glances.folder_list import FolderList as glancesFolderList
 from glances.plugins.glances_plugin import GlancesPlugin
 from glances.logger import logger
-from memory_profiler import profile
 
 
 class Plugin(GlancesPlugin):
@@ -48,10 +47,8 @@ class Plugin(GlancesPlugin):
         """Return the key of the list."""
         return 'path'
 
-    fp=open('/tmp/memory_profiler_stats_folders.log','w+')
     @GlancesPlugin._check_decorator
     @GlancesPlugin._log_result_decorator
-    @profile(stream=fp, precision=4)
     def update(self):
         """Update the foldered list."""
         # Init new stats

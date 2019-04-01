@@ -23,7 +23,6 @@ from glances.compat import iterkeys
 from glances.plugins.glances_plugin import GlancesPlugin
 
 import psutil
-from memory_profiler import profile
 
 # SNMP OID
 # Total Swap Size: .1.3.6.1.4.1.2021.4.3.0
@@ -56,10 +55,8 @@ class Plugin(GlancesPlugin):
         # We want to display the stat in the curse interface
         self.display_curse = True
 
-    fp=open('/tmp/memory_profiler_stats_mamswap.log','w+')
     @GlancesPlugin._check_decorator
     @GlancesPlugin._log_result_decorator
-    @profile(stream=fp, precision=4)
     def update(self):
         """Update swap memory stats using the input method."""
         # Init new stats

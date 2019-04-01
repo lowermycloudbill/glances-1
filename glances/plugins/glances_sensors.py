@@ -30,7 +30,6 @@ from glances.plugins.glances_plugin import GlancesPlugin
 
 SENSOR_TEMP_UNIT = 'C'
 SENSOR_FAN_UNIT = 'R'
-from memory_profiler import profile
 
 
 def to_fahrenheit(celsius):
@@ -69,10 +68,8 @@ class Plugin(GlancesPlugin):
         """Return the key of the list."""
         return 'label'
 
-    fp=open('/tmp/memory_profiler_stats_sensors.log','w+')
     @GlancesPlugin._check_decorator
     @GlancesPlugin._log_result_decorator
-    @profile(stream=fp, precision=4)
     def update(self):
         """Update sensors stats using the input method."""
         # Init new stats

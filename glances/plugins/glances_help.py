@@ -25,7 +25,6 @@ Just a stupid plugin to display the help screen.
 
 from glances import __version__, psutil_version
 from glances.plugins.glances_plugin import GlancesPlugin
-from memory_profiler import profile
 
 
 class Plugin(GlancesPlugin):
@@ -49,8 +48,6 @@ class Plugin(GlancesPlugin):
         """No stats. It is just a plugin to display the help."""
         pass
 
-    fp=open('/tmp/memory_profiler_stats_help.log','w+')
-    @profile(stream=fp, precision=4)
     def update(self):
         """No stats. It is just a plugin to display the help."""
         pass

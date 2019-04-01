@@ -27,7 +27,6 @@ from glances.plugins.glances_core import Plugin as CorePlugin
 from glances.plugins.glances_plugin import GlancesPlugin
 
 import psutil
-from memory_profiler import profile
 
 # SNMP OID
 # percentage of user CPU time: .1.3.6.1.4.1.2021.11.9.0
@@ -73,10 +72,8 @@ class Plugin(GlancesPlugin):
         except Exception:
             self.nb_log_core = 1
 
-    fp=open('/tmp/memory_profiler_stats_cpu.log','w+')
     @GlancesPlugin._check_decorator
     @GlancesPlugin._log_result_decorator
-    @profile(stream=fp, precision=4)
     def update(self):
         """Update CPU stats using the input method."""
 

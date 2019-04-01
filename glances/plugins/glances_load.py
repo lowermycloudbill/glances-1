@@ -20,7 +20,6 @@
 """Load plugin."""
 
 import os
-from memory_profiler import profile
 
 from glances.compat import iteritems
 from glances.plugins.glances_core import Plugin as CorePlugin
@@ -64,10 +63,8 @@ class Plugin(GlancesPlugin):
         except Exception:
             self.nb_log_core = 1
 
-    fp=open('/tmp/memory_profiler_stats_load.log','w+')
     @GlancesPlugin._check_decorator
     @GlancesPlugin._log_result_decorator
-    @profile(stream=fp, precision=4)
     def update(self):
         """Update load stats."""
         # Init new stats

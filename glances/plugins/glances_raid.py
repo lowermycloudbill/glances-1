@@ -22,7 +22,6 @@
 from glances.compat import iterkeys
 from glances.logger import logger
 from glances.plugins.glances_plugin import GlancesPlugin
-from memory_profiler import profile
 
 # Import plugin specific dependency
 try:
@@ -47,10 +46,8 @@ class Plugin(GlancesPlugin):
         # We want to display the stat in the curse interface
         self.display_curse = True
 
-    fp=open('/tmp/memory_profiler_stats_raid.log','w+')
     @GlancesPlugin._check_decorator
     @GlancesPlugin._log_result_decorator
-    @profile(stream=fp, precision=4)
     def update(self):
         """Update RAID stats using the input method."""
         # Init new stats

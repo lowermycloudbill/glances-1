@@ -29,7 +29,6 @@ from glances.globals import WINDOWS
 from glances.processes import glances_processes, sort_stats
 from glances.plugins.glances_core import Plugin as CorePlugin
 from glances.plugins.glances_plugin import GlancesPlugin
-from memory_profiler import profile
 
 def seconds_to_hms(input_seconds):
     """Convert seconds to human-readable time."""
@@ -121,8 +120,6 @@ class Plugin(GlancesPlugin):
         """Return the key of the list."""
         return 'pid'
 
-    fp=open('/tmp/memory_profiler_stats_processlist.log','w+')
-    @profile(stream=fp, precision=4)
     def update(self):
         """Update processes stats using the input method."""
         # Init new stats
