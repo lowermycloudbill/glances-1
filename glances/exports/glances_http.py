@@ -19,7 +19,6 @@
 
 """CloudAdmin HTTP interface class."""
 import os
-import json
 import requests
 import datetime
 import ConfigParser
@@ -59,7 +58,8 @@ class Export(GlancesExportBulk):
 
         headers = {
           'apikey' : self.api_key,
-          'host' : self.host
+          'host' : self.host,
+          'Content-Type': 'application/json'
         }
 
         self.metadata = metadata
@@ -85,7 +85,8 @@ class Export(GlancesExportBulk):
         os._exit(0)
       else:
         try:
-            r = requests.post(self.http_endpoint, json=self.bulk, headers=self.headers, timeout=timeout)
+            encoded_body = json.dumps(self.bulk)
+            r = requests.post(self.http_endpoint, data=encoded_body, headers=self.headers, timeout=timeout)
         except Exception as e:
             logger.debug('export http - Cannot connect to the endpoint {}: {}'.format(self.http_endpoint, e))
       self.bulk = {}
