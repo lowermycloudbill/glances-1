@@ -89,7 +89,7 @@ class TestGlances(unittest.TestCase):
 
     def test_002_cloudadmin_version(self):
         """Check SYSTEM plugin."""
-        stats_to_check = ['version']
+        stats_to_check = ['cloudadmin_version']
         print('INFO: [TEST_002] Check SYSTEM stats: %s' % ', '.join(stats_to_check))
         stats_grab = stats.get_plugin('cloudadmin_version').get_raw()
         for stat in stats_to_check:
