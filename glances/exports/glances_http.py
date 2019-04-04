@@ -19,6 +19,7 @@
 
 """CloudAdmin HTTP interface class."""
 import os
+import certifi
 import urllib3
 import datetime
 import ConfigParser
@@ -81,7 +82,7 @@ class Export(GlancesExportBulk):
         os._exit(0)
       else:
         try:
-            http = urllib3.PoolManager()
+            http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED',ca_certs=certifi.where())
             encoded_body = json.dumps(self.bulk)
             response = http.request('POST', self.http_endpoint, headers=self.headers, body=encoded_body, timeout=timeout)
             response.close()
