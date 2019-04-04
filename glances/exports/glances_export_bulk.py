@@ -66,7 +66,8 @@ class GlancesExportBulk(object):
                 'processcount',
                 'processlist',
                 'network',
-                'system']
+                'system',
+                'cloudadmin_version']
 
     def load_conf(self, section, mandatories=['host', 'port'], options=None):
         """Load the export <section> configuration in the Glances configuration file.

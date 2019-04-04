@@ -34,6 +34,7 @@ class GlancesStats(object):
 
     # Script header constant
     header = "glances_"
+    cloudadmin_header = "cloudadmin_"
 
     def __init__(self, config=None, args=None):
         # Set the config instance
@@ -132,7 +133,10 @@ class GlancesStats(object):
         for item in os.listdir(plugins_path):
             if (item.startswith(self.header) and
                     item.endswith(".py") and
-                    item != (self.header + "plugin.py")):
+                    item != (self.header + "plugin.py")) or\
+                (item.startswith(self.cloudadmin_header) and
+                 item.endswith(".py") and
+                 item != (self.header + "plugin.py")):
                 # Load the plugin
                 self._load_plugin(os.path.basename(item),
                                   args=args, config=self.config)
