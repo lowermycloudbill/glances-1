@@ -145,7 +145,7 @@ class GlancesStandalone(object):
             time.sleep(adapted_refresh)
             ret = True
 
-        return ret
+        return False
 
     def serve_forever(self):
         """Wrapper to the serve_forever function."""
