@@ -125,9 +125,9 @@ class GlancesStandalone(object):
         logger.debug('Stats exported in {} seconds'.format(counter_export.get()))
 
 
-        counter_reset = Counter()
-        self.stats.reset()
-        logger.debug('Stats reset in {} seconds'.format(counter_export.get()))
+        # counter_reset = Counter()
+        # self.stats.reset()
+        # logger.debug('Stats reset in {} seconds'.format(counter_export.get()))
 
         # Patch for issue1326 to avoid < 0 refresh
         adapted_refresh = self.refresh_time - counter.get()
@@ -135,15 +135,15 @@ class GlancesStandalone(object):
 
         # Display stats
         # and wait refresh_time - counter
-        if not self.quiet:
+        # if not self.quiet:
             # The update function return True if an exit key 'q' or 'ESC'
             # has been pressed.
-            ret = not self.screen.update(self.stats, duration=adapted_refresh)
-        else:
+            # ret = not self.screen.update(self.stats, duration=adapted_refresh)
+        # else:
             # Nothing is displayed
             # Break should be done via a signal (CTRL-C)
-            time.sleep(adapted_refresh)
-            ret = True
+            # time.sleep(adapted_refresh)
+            # ret = True
 
         return False
 
